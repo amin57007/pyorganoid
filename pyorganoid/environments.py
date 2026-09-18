@@ -334,3 +334,90 @@ class ElectricFieldEnvironment(Environment):
             The position at which to calculate the field effect.
         """
         return self.field_strength * position  # May be overridden in subclasses for more complex behavior
+
+
+class HandwritingEnvironment(Environment):
+    """
+    Environment that presents a stream of handwritten digit images (e.g., 0-9 class numbers).
+    Cells can pull the next image/label pair during each simulation step.
+    It is a subclass of the base Environment class.
+
+    Parameters
+    ----------
+    images : array-like
+        Handwritten digit images with shape (n_samples, n_features) or (n_samples, height, width).
+    labels : array-like
+        True class numbers for each image, with shape (n_samples,).
+    dimensions : int, optional
+        The number of dimensions of the environment. Default is 2.
+    size : float, optional
+        The size of the environment. Default is 50.0.
+
+    Attributes
+    ----------
+    conditions : list
+        List of conditions in the environment.
+    dimensions : int
+        The number of dimensions of the environment.
+    size : float
+        The size of the environment.
+    images : np.ndarray
+        Flattened handwritten digit images.
+    labels : np.ndarray
+        True class numbers for each image.
+    index : int
+        Index of the next sample to present.
+    current_image : np.ndarray
+        The most recently presented digit image.
+    current_label : int
+        The most recently presented true class number.
+
+    Methods
+    -------
+    update()
+        Update the environment.
+    add_condition(condition)
+        Add a condition to the environment
+    next_sample()
+        Return the next handwritten digit image and its true class number.
+    reset()
+        Reset the sample stream to the first digit.
+    """
+    def __init__(self, images, labels, dimensions=2, size=50.0):
+        super().__init__(dimensions, size)
+        self.images = np.asarray(images, dtype=float)
+        if self.images.ndim > 2:
+            self.images = self.images.reshape(len(self.images), -1)
+        self.labels = np.asarray(labels).reshape(-1)
+        if len(self.images) != len(self.labels):
+            raise ValueError("images and labels must contain the same number of samples.")
+        if len(self.images) == 0:
+            raise ValueError("HandwritingEnvironment requires at least one handwritten digit sample.")
+        self.index = 0
+        self.current_image = self.images[0]
+        self.current_label = int(self.labels[0])
+
+    def next_sample(self):
+        """
+        Return the next handwritten digit image and its true class number.
+        The stream wraps around after the last sample.
+
+        Returns
+        -------
+        tuple
+            (image, label) where image is a 1D array of pixels and label is the true class number.
+        """
+        image = self.images[self.index]
+        label = int(self.labels[self.index])
+        self.current_image = image
+        self.current_label = label
+        self.index = (self.index + 1) % len(self.images)
+        return image, label
+
+    def reset(self):
+        """
+        Reset the sample stream to the first digit.
+        """
+        self.index = 0
+        self.current_image = self.images[0]
+        self.current_label = int(self.labels[0])

@@ -521,3 +521,82 @@ class GeneRegulationModule(BaseMLModule):
         scaled_factor = 0.5 + regulation_factor  # Scale regulation_factor from [0, 1] to [0.5, 1.5]
         print(f"Regulation factor: {scaled_factor}")
         agent.regulate_genes(scaled_factor)
+
+
+class DigitClassificationModule(BaseMLModule):
+    """
+    Module for classifying handwritten digit images into class numbers (0-9) using a machine learning model.
+    If the agent is attached to a HandwritingEnvironment, the module pulls the next digit sample before predicting.
+    It is a subclass of the BaseMLModule class.
+
+    Parameters
+    ----------
+    ml_model : BaseMLModel
+        The machine learning model to use for prediction.
+
+    Attributes
+    ----------
+    ml_model : BaseMLModel
+        The machine learning model to use for prediction.
+
+    Methods
+    -------
+    run(agent, verbose=False)
+        Run the module on the given agent.
+    collect_input_data(agent)
+        Collect the handwritten digit pixels for the machine learning model.
+    apply_prediction(agent, prediction)
+        Apply the predicted class number to the agent.
+    """
+
+    @staticmethod
+    def collect_input_data(agent):
+        """
+        Collect the input data for the machine learning model.
+        If the agent has a handwriting environment, assign the next digit sample first.
+
+        Parameters
+        ----------
+        agent : Agent
+            The agent to collect input data from.
+
+        Returns
+        -------
+        array-like
+            Flattened handwritten digit pixels.
+
+        Raises
+        ------
+        ValueError
+            If the agent has no digit image assigned.
+        """
+        environment = getattr(agent, "environment", None)
+        if environment is not None and hasattr(environment, "next_sample"):
+            image, label = environment.next_sample()
+            agent.assign_sample(image, label)
+        image = agent.get_digit_image()
+        if image is None:
+            raise ValueError("DigitClassificationCell has no handwritten digit image assigned.")
+        return np.asarray(image, dtype=float).flatten()
+
+    def apply_prediction(self, agent, prediction):
+        """
+        Apply the prediction of the machine learning model to the agent.
+        Sets the agent's predicted class number from a class label or a probability vector.
+
+        Parameters
+        ----------
+        agent : Agent
+            The agent to apply the prediction to.
+        prediction : array-like
+            The prediction output of the machine learning model.
+        """
+        prediction = self.drop_prediction_dimensionality(prediction)
+        values = np.asarray(prediction).reshape(-1)
+        if values.size == 0:
+            predicted_class = -1
+        elif values.size > 1:
+            predicted_class = int(np.argmax(values))
+        else:
+            predicted_class = int(np.round(values[0]))
+        agent.classify(predicted_class)

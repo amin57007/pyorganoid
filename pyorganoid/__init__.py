@@ -2,19 +2,22 @@ from .base import Agent, Cell, Synapse, Organoid
 from .models import BaseMLModel
 from .cells import (
     SpikingNeuronCell, GrowthShrinkageCell, DifferentiatingCell, ChemotacticCell,
-    ImmuneCell, SynapticPlasticityCell, MetabolicCell, GeneRegulationCell
+    ImmuneCell, SynapticPlasticityCell, MetabolicCell, GeneRegulationCell,
+    DigitClassificationCell
 )
 from .modules import (
     BaseModule, BaseMLModule, SpikingNeuronModule, GrowthShrinkageModule, DifferentiationModule, ChemotaxisModule,
-    ImmuneResponseModule, SynapticPlasticityModule, MetabolicModule, GeneRegulationModule
+    ImmuneResponseModule, SynapticPlasticityModule, MetabolicModule, GeneRegulationModule,
+    DigitClassificationModule
 )
 from .organoids import (
     SpikingNeuronOrganoid, GrowthShrinkageOrganoid, DifferentiationOrganoid, ChemotaxisOrganoid,
-    ImmuneResponseOrganoid, SynapticPlasticityOrganoid, MetabolicOrganoid, GeneRegulationOrganoid
+    ImmuneResponseOrganoid, SynapticPlasticityOrganoid, MetabolicOrganoid, GeneRegulationOrganoid,
+    DigitClassificationOrganoid
 )
 from .environments import (
     Environment, GradientEnvironment, TemperatureEnvironment, StochasticEnvironment,
-    ChemicalGradientEnvironment, ElectricFieldEnvironment
+    ChemicalGradientEnvironment, ElectricFieldEnvironment, HandwritingEnvironment
 )
 from .simulation import Scheduler, StochasticScheduler, PriorityScheduler, ParallelScheduler
 from .agents import AgentContainer, AgentHandle
@@ -25,11 +28,11 @@ from .utils import generate_random_position
 
 __all__ = [
     'Agent', 'Cell', 'Synapse', 'Organoid',
-    'SpikingNeuronCell', 'GrowthShrinkageCell', 'DifferentiatingCell', 'ChemotacticCell', 'ImmuneCell', 'SynapticPlasticityCell', 'MetabolicCell', 'GeneRegulationCell',
-    'SpikingNeuronOrganoid', 'GrowthShrinkageOrganoid', 'DifferentiationOrganoid', 'ChemotaxisOrganoid', 'ImmuneResponseOrganoid', 'SynapticPlasticityOrganoid', 'MetabolicOrganoid', 'GeneRegulationOrganoid',
-    'BaseModule', 'SpikingNeuronModule', 'GrowthShrinkageModule', 'DifferentiationModule', 'ChemotaxisModule', 'ImmuneResponseModule', 'SynapticPlasticityModule', 'MetabolicModule', 'GeneRegulationModule',
+    'SpikingNeuronCell', 'GrowthShrinkageCell', 'DifferentiatingCell', 'ChemotacticCell', 'ImmuneCell', 'SynapticPlasticityCell', 'MetabolicCell', 'GeneRegulationCell', 'DigitClassificationCell',
+    'SpikingNeuronOrganoid', 'GrowthShrinkageOrganoid', 'DifferentiationOrganoid', 'ChemotaxisOrganoid', 'ImmuneResponseOrganoid', 'SynapticPlasticityOrganoid', 'MetabolicOrganoid', 'GeneRegulationOrganoid', 'DigitClassificationOrganoid',
+    'BaseModule', 'SpikingNeuronModule', 'GrowthShrinkageModule', 'DifferentiationModule', 'ChemotaxisModule', 'ImmuneResponseModule', 'SynapticPlasticityModule', 'MetabolicModule', 'GeneRegulationModule', 'DigitClassificationModule',
     'BaseMLModel',
-    'Environment', 'GradientEnvironment', 'TemperatureEnvironment', 'StochasticEnvironment', 'ChemicalGradientEnvironment', 'ElectricFieldEnvironment',
+    'Environment', 'GradientEnvironment', 'TemperatureEnvironment', 'StochasticEnvironment', 'ChemicalGradientEnvironment', 'ElectricFieldEnvironment', 'HandwritingEnvironment',
     'Scheduler', 'StochasticScheduler', 'PriorityScheduler', 'ParallelScheduler',
     'AgentContainer', 'AgentHandle',
     'generate_random_position',
