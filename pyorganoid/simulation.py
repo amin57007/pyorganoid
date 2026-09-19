@@ -166,3 +166,81 @@ class ParallelScheduler(Scheduler):
         NotImplementedError
         """
         raise NotImplementedError("Parallel simulation is not yet implemented. Please use a different scheduler.")
+
+
+class NeuroplatformScheduler(Scheduler):
+    """
+    Closed-loop scheduler modeled on FinalSpark trigger -> wait -> read_count.
+
+    Each trial: encode image, upload StimParams, send a 16-d trigger, run window_steps
+    of integrate-and-fire updates, then return the 128-d spike-count vector.
+
+    Parameters
+    ----------
+    organoid : NeuroplatformOrganoid
+        Organoid whose environment is a NeuroplatformEnvironment.
+    """
+    def present(self, image):
+        """
+        Present one stimulus and return the full 128-channel spike-count vector.
+
+        Parameters
+        ----------
+        image : array-like
+            Handwritten digit pixels.
+
+        Returns
+        -------
+        np.ndarray
+            Integer vector of length 128.
+        """
+        environment = self.organoid.environment
+        amplitudes = environment.encode_image(image, n_electrodes=len(environment.organoid_electrodes))
+        environment.arm_stim(amplitudes)
+        trigger = np.zeros(environment.N_TRIGGERS, dtype=np.uint8)
+        trigger[environment.pattern_trigger] = 1
+        environment.send(trigger)
+        for _ in range(environment.window_steps):
+            for agent in self.organoid.agents:
+                agent.update()
+        return environment.read_count()
+
+    def simulate(self, images, decoder=None, verbose=True):
+        """
+        Present a sequence of images and optionally decode each spike-count vector.
+
+        Parameters
+        ----------
+        images : array-like
+            Collection of digit images.
+        decoder : object, optional
+            Object with a ``predict`` method on the 8-d organoid count vector.
+        verbose : bool, optional
+            Print trial progress. Default is True.
+
+        Returns
+        -------
+        dict
+            counts (n, 128), organoid_counts (n, 8), and predictions if a decoder is given.
+        """
+        images = list(images)
+        all_counts = []
+        all_organoid = []
+        predictions = []
+        n = len(images)
+        for i, image in enumerate(images):
+            if verbose and (i == 0 or (i + 1) % 100 == 0 or i + 1 == n):
+                print(f"Trial {i + 1}/{n}")
+            counts = self.present(image)
+            organoid_counts = self.organoid.environment.organoid_counts(counts)
+            all_counts.append(counts)
+            all_organoid.append(organoid_counts)
+            if decoder is not None:
+                predictions.append(int(np.asarray(decoder.predict(organoid_counts.reshape(1, -1))).reshape(-1)[0]))
+        result = {
+            "counts": np.asarray(all_counts, dtype=int),
+            "organoid_counts": np.asarray(all_organoid, dtype=float),
+        }
+        if decoder is not None:
+            result["predictions"] = np.asarray(predictions, dtype=int)
+        return result

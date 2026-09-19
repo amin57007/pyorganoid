@@ -600,3 +600,44 @@ class DigitClassificationModule(BaseMLModule):
         else:
             predicted_class = int(np.round(values[0]))
         agent.classify(predicted_class)
+
+
+class NeuroplatformModule(BaseModule):
+    """
+    Inject MEA stimulation current into a spiking cell and count threshold crossings.
+    This is the tissue side of a FinalSpark-style closed loop (no decoder inside the cell).
+
+    Parameters
+    ----------
+    electrode_index : int
+        Channel index on the 128-electrode map.
+    gain : float, optional
+        Multiplier applied to the armed stimulation amplitude. Default is 1.0.
+    leak : float, optional
+        Fraction of membrane potential leaked each inner step. Default is 0.05.
+    """
+    def __init__(self, electrode_index, gain=1.0, leak=0.05):
+        super().__init__()
+        self.electrode_index = int(electrode_index)
+        self.gain = float(gain)
+        self.leak = float(leak)
+
+    def run(self, agent):
+        """
+        Apply electrode current, optional leak, and record a spike if threshold is crossed.
+
+        Parameters
+        ----------
+        agent : SpikingNeuronCell
+            The electrode-mapped cell.
+        """
+        environment = getattr(agent, "environment", None)
+        if environment is None:
+            return
+        if self.leak:
+            agent.membrane_potential *= (1.0 - self.leak)
+        amplitude = float(environment.stim_amplitudes[self.electrode_index])
+        noise = np.random.normal(0.0, environment.noise_std) if environment.noise_std else 0.0
+        agent.membrane_potential += self.gain * amplitude + noise
+        if agent.membrane_potential >= agent.threshold:
+            environment.record_spike(self.electrode_index)

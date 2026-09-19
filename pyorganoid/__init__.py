@@ -8,18 +8,19 @@ from .cells import (
 from .modules import (
     BaseModule, BaseMLModule, SpikingNeuronModule, GrowthShrinkageModule, DifferentiationModule, ChemotaxisModule,
     ImmuneResponseModule, SynapticPlasticityModule, MetabolicModule, GeneRegulationModule,
-    DigitClassificationModule
+    DigitClassificationModule, NeuroplatformModule
 )
 from .organoids import (
     SpikingNeuronOrganoid, GrowthShrinkageOrganoid, DifferentiationOrganoid, ChemotaxisOrganoid,
     ImmuneResponseOrganoid, SynapticPlasticityOrganoid, MetabolicOrganoid, GeneRegulationOrganoid,
-    DigitClassificationOrganoid
+    DigitClassificationOrganoid, NeuroplatformOrganoid
 )
 from .environments import (
     Environment, GradientEnvironment, TemperatureEnvironment, StochasticEnvironment,
-    ChemicalGradientEnvironment, ElectricFieldEnvironment, HandwritingEnvironment
+    ChemicalGradientEnvironment, ElectricFieldEnvironment, HandwritingEnvironment,
+    StimParam, NeuroplatformEnvironment
 )
-from .simulation import Scheduler, StochasticScheduler, PriorityScheduler, ParallelScheduler
+from .simulation import Scheduler, StochasticScheduler, PriorityScheduler, ParallelScheduler, NeuroplatformScheduler
 from .agents import AgentContainer, AgentHandle
 from .utils import generate_random_position
 # TODO: bioinformatics and cheminformatics modules/importing, e.g. sequence alignment, molecular docking, etc.;
@@ -29,11 +30,11 @@ from .utils import generate_random_position
 __all__ = [
     'Agent', 'Cell', 'Synapse', 'Organoid',
     'SpikingNeuronCell', 'GrowthShrinkageCell', 'DifferentiatingCell', 'ChemotacticCell', 'ImmuneCell', 'SynapticPlasticityCell', 'MetabolicCell', 'GeneRegulationCell', 'DigitClassificationCell',
-    'SpikingNeuronOrganoid', 'GrowthShrinkageOrganoid', 'DifferentiationOrganoid', 'ChemotaxisOrganoid', 'ImmuneResponseOrganoid', 'SynapticPlasticityOrganoid', 'MetabolicOrganoid', 'GeneRegulationOrganoid', 'DigitClassificationOrganoid',
-    'BaseModule', 'SpikingNeuronModule', 'GrowthShrinkageModule', 'DifferentiationModule', 'ChemotaxisModule', 'ImmuneResponseModule', 'SynapticPlasticityModule', 'MetabolicModule', 'GeneRegulationModule', 'DigitClassificationModule',
+    'SpikingNeuronOrganoid', 'GrowthShrinkageOrganoid', 'DifferentiationOrganoid', 'ChemotaxisOrganoid', 'ImmuneResponseOrganoid', 'SynapticPlasticityOrganoid', 'MetabolicOrganoid', 'GeneRegulationOrganoid', 'DigitClassificationOrganoid', 'NeuroplatformOrganoid',
+    'BaseModule', 'SpikingNeuronModule', 'GrowthShrinkageModule', 'DifferentiationModule', 'ChemotaxisModule', 'ImmuneResponseModule', 'SynapticPlasticityModule', 'MetabolicModule', 'GeneRegulationModule', 'DigitClassificationModule', 'NeuroplatformModule',
     'BaseMLModel',
-    'Environment', 'GradientEnvironment', 'TemperatureEnvironment', 'StochasticEnvironment', 'ChemicalGradientEnvironment', 'ElectricFieldEnvironment', 'HandwritingEnvironment',
-    'Scheduler', 'StochasticScheduler', 'PriorityScheduler', 'ParallelScheduler',
+    'Environment', 'GradientEnvironment', 'TemperatureEnvironment', 'StochasticEnvironment', 'ChemicalGradientEnvironment', 'ElectricFieldEnvironment', 'HandwritingEnvironment', 'StimParam', 'NeuroplatformEnvironment',
+    'Scheduler', 'StochasticScheduler', 'PriorityScheduler', 'ParallelScheduler', 'NeuroplatformScheduler',
     'AgentContainer', 'AgentHandle',
     'generate_random_position',
     # Conditional inclusion based on availability of required packages

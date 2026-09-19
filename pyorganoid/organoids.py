@@ -384,3 +384,43 @@ class DigitClassificationOrganoid(Organoid):
             plt.close(fig)
         else:
             plt.show()
+
+
+class NeuroplatformOrganoid(Organoid):
+    """
+    Simulated FinalSpark organoid: eight integrate-and-fire cells, one per MEA electrode.
+
+    The organoid is the tissue. It does not classify digits. A separate decoder reads
+    ``environment.read_count()`` after each closed-loop window.
+
+    Parameters
+    ----------
+    environment : NeuroplatformEnvironment
+        MEA environment that supplies stimulation and spike counts.
+    electrodes : array-like, optional
+        Channel indices. Default is the environment's organoid_electrodes.
+    threshold : float, optional
+        Spike threshold. Default is 1.0.
+    gain : float, optional
+        Stimulation current gain. Default is 1.0.
+    leak : float, optional
+        Membrane leak per inner step. Default is 0.05.
+    """
+    def __init__(self, environment, electrodes=None, threshold=1.0, gain=1.0, leak=0.05):
+        super().__init__(environment)
+        if electrodes is None:
+            electrodes = getattr(environment, "organoid_electrodes", range(8))
+        self.electrodes = [int(e) for e in electrodes]
+        n_cols = 4
+        spacing = environment.size / max(n_cols, 1)
+        for i, electrode_index in enumerate(self.electrodes):
+            row, col = divmod(i, n_cols)
+            position = np.array([(col + 0.5) * spacing, (row + 0.5) * spacing], dtype=float)
+            if environment.dimensions == 3:
+                position = np.append(position, environment.size / 2.0)
+            cell = SpikingNeuronCell(position=position, threshold=threshold,
+                                     input_data_func=lambda _=None: [0.0])
+            cell.environment = environment
+            cell.electrode_index = electrode_index
+            cell.add_module(NeuroplatformModule(electrode_index, gain=gain, leak=leak))
+            self.add_agent(cell)

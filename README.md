@@ -89,6 +89,9 @@ If you prefer Scikit-Learn, PyTorch, or ONNX models, see the [Volumetric Organoi
 the [Gene Regulation Organoid Test (PyTorch)](tests/test_generegulation.py), or
 the [Immune Response Organoid Test (ONNX)](tests/test_immune.py), respectively.
 
+To simulate a FinalSpark Neuroplatform closed loop (8 electrodes, trigger, 200 ms spike counts,
+then a decoder), see [examples/neuroplatform](examples/neuroplatform/README.md).
+
 For example:
 ```python
 import pyorganoid as po

@@ -1,0 +1,62 @@
+{
+  "n_train": 797,
+  "n_test": 1000,
+  "picture_size": [
+    8,
+    8
+  ],
+  "n_pixels": 64,
+  "n_electrodes": 8,
+  "n_channels": 128,
+  "n_triggers": 16,
+  "window_steps": 10,
+  "window_ms": 200.0,
+  "latency_ms": 40.0,
+  "encoding": "row_mean_8x8_to_8_electrodes",
+  "tissue": "8 integrate-and-fire cells, threshold=1.0, leak=0.05",
+  "decoder": "MLPClassifier(32, 16) on 8-d spike counts",
+  "accuracy": 0.659,
+  "per_class": {
+    "0": {
+      "n": 99,
+      "accuracy": 0.5151515151515151
+    },
+    "1": {
+      "n": 101,
+      "accuracy": 0.42574257425742573
+    },
+    "2": {
+      "n": 98,
+      "accuracy": 0.7142857142857143
+    },
+    "3": {
+      "n": 102,
+      "accuracy": 0.5686274509803921
+    },
+    "4": {
+      "n": 101,
+      "accuracy": 0.8613861386138614
+    },
+    "5": {
+      "n": 101,
+      "accuracy": 0.5841584158415841
+    },
+    "6": {
+      "n": 101,
+      "accuracy": 0.8811881188118812
+    },
+    "7": {
+      "n": 100,
+      "accuracy": 0.8
+    },
+    "8": {
+      "n": 97,
+      "accuracy": 0.5051546391752577
+    },
+    "9": {
+      "n": 100,
+      "accuracy": 0.73
+    }
+  },
+  "classification_report": "              precision    recall  f1-score   support\n\n           0      0.472     0.515     0.493        99\n           1      0.558     0.426     0.483       101\n           2      0.769     0.714     0.741        98\n           3      0.558     0.569     0.563       102\n           4      0.879     0.861     0.870       101\n           5      0.641     0.584     0.611       101\n           6      0.840     0.881     0.860       101\n           7      0.816     0.800     0.808       100\n           8      0.412     0.505     0.454        97\n           9      0.689     0.730     0.709       100\n\n    accuracy                          0.659      1000\n   macro avg      0.663     0.659     0.659      1000\nweighted avg      0.664     0.659     0.660      1000\n"
+}
