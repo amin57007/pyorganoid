@@ -616,3 +616,113 @@ class GeneRegulationCell(Cell):
             The gene expression level of the cell.
         """
         return self.gene_expression_level
+
+
+class DigitClassificationCell(Cell):
+    """
+    A sensory cell that classifies a handwritten digit image into a class number (0-9).
+    It is a subclass of the base Cell class.
+
+    Parameters
+    ----------
+    position : {tuple, int}
+        The position of the cell.
+    digit_image : array-like, optional
+        Flattened handwritten digit pixels. Default is None.
+    true_label : int, optional
+        The true class number of the digit image. Default is None.
+    input_data_func : function, optional
+        A function to generate input data for the cell. Default is None.
+
+    Attributes
+    ----------
+    position : {tuple, int}
+        The position of the cell in the environment.
+    modules : list
+        List of modules that define the behavior of the cell.
+    history : list
+        List of predicted class numbers over time.
+    input_data_func : function, optional
+        A function to generate input data for the cell.
+    digit_image : array-like
+        Flattened handwritten digit pixels currently assigned to the cell.
+    true_label : int
+        The true class number of the currently assigned digit.
+    predicted_class : int
+        The most recent predicted class number. Default is -1 (unclassified).
+    true_label_history : list
+        True class numbers assigned at each time step.
+    predicted_history : list
+        Predicted class numbers produced at each time step.
+
+    Methods
+    -------
+    update()
+        Update the cell's state.
+    get_history()
+        Get the historical predicted class numbers of the cell.
+    get_input_data()
+        Get the input data for the cell.
+    assign_sample(image, label)
+        Assign a handwritten digit image and its true class number.
+    classify(predicted_class)
+        Store the predicted class number for the current digit.
+    get_digit_image()
+        Get the currently assigned handwritten digit image.
+    """
+    def __init__(self, position, digit_image=None, true_label=None, input_data_func=None):
+        super().__init__(position, input_data_func=input_data_func or self.get_digit_image)
+        self.digit_image = None if digit_image is None else np.asarray(digit_image, dtype=float).flatten()
+        self.true_label = None if true_label is None else int(true_label)
+        self.predicted_class = -1
+        self.true_label_history = []
+        self.predicted_history = []
+        self.digit_image_history = []
+
+    def update(self):
+        """
+        Update the cell's state based on its predicted digit class.
+        """
+        super().update()
+        self.history.append(self.predicted_class)
+        if self.true_label is not None and self.predicted_class >= 0:
+            self.true_label_history.append(self.true_label)
+            self.predicted_history.append(self.predicted_class)
+            if self.digit_image is not None:
+                self.digit_image_history.append(np.asarray(self.digit_image, dtype=float).flatten())
+
+    def assign_sample(self, image, label):
+        """
+        Assign a handwritten digit image and its true class number.
+
+        Parameters
+        ----------
+        image : array-like
+            Flattened or 2D handwritten digit pixels.
+        label : int
+            The true class number of the digit.
+        """
+        self.digit_image = np.asarray(image, dtype=float).flatten()
+        self.true_label = int(label)
+
+    def classify(self, predicted_class):
+        """
+        Store the predicted class number for the current digit.
+
+        Parameters
+        ----------
+        predicted_class : int
+            The predicted class number (0-9).
+        """
+        self.predicted_class = int(predicted_class)
+
+    def get_digit_image(self, _=None):
+        """
+        Get the currently assigned handwritten digit image.
+
+        Returns
+        -------
+        array-like
+            Flattened handwritten digit pixels, or None if no image is assigned.
+        """
+        return self.digit_image

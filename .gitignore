@@ -8,3 +8,5 @@
 # Ignore all files in the test folder except .py files
 tests/*
 !tests/*.py
+
+examples/neuroplatform/output/*.pkl
