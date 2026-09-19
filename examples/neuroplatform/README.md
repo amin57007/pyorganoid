@@ -37,6 +37,8 @@ python examples/neuroplatform/run_closed_loop.py
 
 This trains a decoder on 797 digits, then runs **1000** closed-loop trials. Figures land in `examples/neuroplatform/figures/`.
 
+Graphviz (`dot`) is **optional**. If you see `failed to execute WindowsPath('dot')`, the classification still ran; only the Graphviz organoid diagram was skipped. Matplotlib figures (confusion matrix, encoding bars, MEA site, running accuracy) are enough. To get the Graphviz diagram on Windows, install [Graphviz](https://graphviz.org/download/), enable **Add to PATH**, then open a new PowerShell.
+
 ## Minimal closed loop
 
 ```python

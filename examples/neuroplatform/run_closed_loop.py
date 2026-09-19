@@ -129,6 +129,61 @@ def plot_running_accuracy(y_true, y_pred, filename, dpi=200):
     plt.close(fig)
 
 
+def plot_organoid_structure_matplotlib(organoid, filename, dpi=200):
+    """Draw the 8-electrode organoid without Graphviz (works on Windows)."""
+    environment = organoid.environment
+    electrodes = list(getattr(environment, "organoid_electrodes", range(8)))
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.set_xlim(-0.5, 5.5)
+    ax.set_ylim(-0.8, 3.2)
+    ax.axis("off")
+    ax.set_title("Neuroplatform organoid (8 electrodes, Graphviz not required)")
+
+    env_box = plt.Rectangle((0.2, 2.35), 5.1, 0.7, fill=True, facecolor="#E8F1F8",
+                            edgecolor="#1F4E79", linewidth=1.5)
+    ax.add_patch(env_box)
+    ax.text(2.75, 2.7, f"{type(environment).__name__}  |  128 ch, 16 triggers, 8-site MEA",
+            ha="center", va="center", fontsize=10)
+
+    org_box = plt.Rectangle((0.2, 1.45), 5.1, 0.7, fill=True, facecolor="#F7F3E8",
+                            edgecolor="#8A6D3B", linewidth=1.5)
+    ax.add_patch(org_box)
+    ax.text(2.75, 1.8, f"{type(organoid).__name__}  |  {len(organoid.agents)} I&F cells",
+            ha="center", va="center", fontsize=10)
+
+    for i, cell in enumerate(organoid.agents):
+        col = i % 4
+        row = 1 - (i // 4)
+        x, y = 0.55 + col * 1.25, 0.15 + row * 0.7
+        ax.add_patch(plt.Circle((x + 0.4, y + 0.22), 0.28, facecolor="#1F4E79", edgecolor="black"))
+        electrode = getattr(cell, "electrode_index", electrodes[i] if i < len(electrodes) else i)
+        ax.text(x + 0.4, y + 0.22, f"e{electrode}", ha="center", va="center", color="white", fontsize=8)
+
+    fig.tight_layout()
+    fig.savefig(filename, dpi=dpi)
+    plt.close(fig)
+    print(f'Organoid structure plot saved as "{filename}"')
+
+
+def try_plot_organoid(organoid, filename):
+    """Prefer Graphviz; fall back to matplotlib if `dot` is missing (common on Windows)."""
+    import shutil
+
+    if shutil.which("dot"):
+        try:
+            organoid.plot_organoid(filename, show_properties=True, dpi=200)
+            return
+        except Exception as exc:
+            print(f"Graphviz plot failed ({exc}); using matplotlib instead.")
+    else:
+        print(
+            "Graphviz `dot` is not on PATH (optional). "
+            "On Windows install https://graphviz.org/download/ and tick 'Add to PATH', "
+            "or ignore this: the closed-loop figures still save via matplotlib."
+        )
+    plot_organoid_structure_matplotlib(organoid, filename)
+
+
 def plot_mea_layout(environment, counts, filename, dpi=200):
     grid = np.zeros((2, 4), dtype=float)
     for i, value in enumerate(counts[:8]):
@@ -162,14 +217,7 @@ def run(n_test=N_TEST, verbose=True, plot=True):
     environment, organoid, scheduler = build_system()
 
     if plot:
-        try:
-            organoid.plot_organoid(
-                os.path.join(FIGURE_DIR, "neuroplatform_organoid.png"),
-                show_properties=True,
-                dpi=200,
-            )
-        except Exception as exc:
-            print(f"Skipping organoid structure plot: {exc}")
+        try_plot_organoid(organoid, os.path.join(FIGURE_DIR, "neuroplatform_organoid.png"))
 
     if verbose:
         print(f"Collecting spike counts on {len(X_train)} train digits (8 electrodes, {WINDOW_STEPS} inner steps)...")
